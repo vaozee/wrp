@@ -39,6 +39,9 @@ const SHEET_USERS     = 'Users';
 const SHEET_AUDIT     = 'AuditLog';
 const SHEET_HARIAN    = 'Harian';        // tab baru di spreadsheet Produksi
 const SHEET_PKS_HARIAN = 'Harian';       // tab baru di spreadsheet PKS (nama sama, file berbeda)
+const SHEET_PERAWATAN  = 'perawatan';    // tab perawatan di DB PKS
+const SHEET_HIST_PUPUK = 'hist pupuk';   // tab hist pupuk di DB PKS
+const SHEET_PEM_BLOK   = 'pemupukan blok'; // tab pemupukan blok di DB PKS
 
 // Kolom asli tab "Produksi" (urutan HARUS sama dengan sheet asli Anda)
 // TANGGAL ditambahkan di akhir (kolom ke-24) - data lama akan kosong untuk kolom ini,
@@ -96,6 +99,14 @@ function handleRequest(e) {
       case 'getPksHarian':       result = getPksHarian(payload); break;
       case 'addPksHarian':       result = addPksHarian(payload); break;
       case 'addPksHarianBatch':  result = addPksHarianBatch(payload); break;
+
+      // ── PERAWATAN ──
+      case 'getPerawatan':       result = getPerawatan(payload); break;
+      case 'getHistPupuk':       result = getHistPupuk(payload); break;
+      case 'getPemupukanBlok':   result = getPemupukanBlok(payload); break;
+
+      // ── PER BLOK ──
+      case 'getPerblok':         result = getPerblok(payload); break;
 
       // ── MASTER BLOK ──
       case 'getBlok':            result = getBlok(payload); break;
@@ -599,4 +610,146 @@ function logAudit(username, kategori, aksi) {
   } catch (e) {
     Logger.log('Gagal mencatat audit: ' + e.message);
   }
+}
+
+// ── PERAWATAN ────────────────────────────────────────────────────────────
+// Membaca tab "perawatan" dari spreadsheet DB PKS.
+// Kolom yang WAJIB ada (nama bebas, dibaca sebagai header baris 1):
+//   KEBUN / ESTATE, AFD, BLOK / KODE_BLOK,
+//   ROT_TERAKHIR_GAWANGAN_CHEMIST, ROT_TERAKHIR_GAWANGAN_MANUAL,
+//   ROT_TERAKHIR_PIRINGAN_CHEMIST, ROT_TERAKHIR_PIRINGAN_MANUAL
+function getPerawatan(p) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID_PKS);
+  const sh = ss.getSheetByName(SHEET_PERAWATAN);
+  if (!sh) return { ok: true, count: 0, data: [], note: 'Sheet "perawatan" tidak ditemukan di DB PKS.' };
+  const lastRow = sh.getLastRow();
+  const lastCol = sh.getLastColumn();
+  if (lastRow < 2 || lastCol < 1) return { ok: true, count: 0, data: [] };
+  const headers = sh.getRange(1, 1, 1, lastCol).getValues()[0].map(h => String(h).trim().toUpperCase().replace(/\s+/g,'_'));
+  const dataRange = sh.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  let rows = dataRange.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ''; });
+    return obj;
+  }).filter(o => Object.values(o).some(v => v !== '' && v !== null));
+
+  if (p.tahun) rows = rows.filter(r => {
+    const thn = r.TAHUN || r.YEAR || r.PERIODE || '';
+    return !thn || String(thn) === String(p.tahun);
+  });
+  if (p.kebun) rows = rows.filter(r => (String(r.KEBUN||r.ESTATE||'')).toUpperCase() === String(p.kebun).toUpperCase());
+  if (p.afd) rows = rows.filter(r => (String(r.AFD||'')).toUpperCase() === String(p.afd).toUpperCase());
+  if (p.blok) rows = rows.filter(r => (String(r.BLOK||r.KODE_BLOK||'')).toUpperCase() === String(p.blok).toUpperCase());
+
+  return { ok: true, count: rows.length, data: rows };
+}
+
+// ── HIST PUPUK ───────────────────────────────────────────────────────────
+// Membaca tab "hist pupuk" dari DB PKS.
+// Kolom penting: KEBUN, AFD, JENIS_PUPUK (atau JENIS), TAHUN,
+//                REALISASI_KG (atau REALISASI), REKOM_KG (atau REKOM)
+function getHistPupuk(p) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID_PKS);
+  const sh = ss.getSheetByName(SHEET_HIST_PUPUK);
+  if (!sh) return { ok: true, count: 0, data: [], note: 'Sheet "hist pupuk" tidak ditemukan di DB PKS.' };
+  const lastRow = sh.getLastRow();
+  const lastCol = sh.getLastColumn();
+  if (lastRow < 2 || lastCol < 1) return { ok: true, count: 0, data: [] };
+  const headers = sh.getRange(1, 1, 1, lastCol).getValues()[0].map(h => String(h).trim().toUpperCase().replace(/\s+/g,'_'));
+  const dataRange = sh.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  let rows = dataRange.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ''; });
+    ['REALISASI_KG','REKOM_KG','REALISASI','REKOM'].forEach(k => { if(obj[k]!==undefined) obj[k] = parseNum(obj[k]); });
+    return obj;
+  }).filter(o => Object.values(o).some(v => v !== '' && v !== null));
+
+  if (p.tahun) rows = rows.filter(r => !r.TAHUN || String(r.TAHUN) === String(p.tahun));
+  if (p.kebun) rows = rows.filter(r => (String(r.KEBUN||'')).toUpperCase() === String(p.kebun).toUpperCase());
+  if (p.afd) rows = rows.filter(r => (String(r.AFD||'')).toUpperCase() === String(p.afd).toUpperCase());
+
+  return { ok: true, count: rows.length, data: rows };
+}
+
+// ── PEMUPUKAN BLOK ───────────────────────────────────────────────────────
+// Membaca tab "pemupukan blok" dari DB PKS.
+// Kolom penting: KEBUN, AFD, BLOK / KODE_BLOK, JENIS_PUPUK (atau JENIS),
+//                REKOM_TOTAL_KG, REALISASI_KG_2026, REALISASI_KG_2025, REALISASI_KG_2024
+function getPemupukanBlok(p) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID_PKS);
+  const sh = ss.getSheetByName(SHEET_PEM_BLOK);
+  if (!sh) return { ok: true, count: 0, data: [], note: 'Sheet "pemupukan blok" tidak ditemukan di DB PKS.' };
+  const lastRow = sh.getLastRow();
+  const lastCol = sh.getLastColumn();
+  if (lastRow < 2 || lastCol < 1) return { ok: true, count: 0, data: [] };
+  const headers = sh.getRange(1, 1, 1, lastCol).getValues()[0].map(h => String(h).trim().toUpperCase().replace(/\s+/g,'_'));
+  const dataRange = sh.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  let rows = dataRange.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ''; });
+    ['REKOM_TOTAL_KG','REKOM_TOTAL','REALISASI_KG_2026','REALISASI_KG_2025','REALISASI_KG_2024'].forEach(k => {
+      if(obj[k]!==undefined) obj[k] = parseNum(obj[k]);
+    });
+    return obj;
+  }).filter(o => Object.values(o).some(v => v !== '' && v !== null));
+
+  if (p.kebun) rows = rows.filter(r => (String(r.KEBUN||'')).toUpperCase() === String(p.kebun).toUpperCase());
+  if (p.afd) rows = rows.filter(r => (String(r.AFD||'')).toUpperCase() === String(p.afd).toUpperCase());
+  if (p.blok) rows = rows.filter(r => (String(r.BLOK||r.KODE_BLOK||'')).toUpperCase() === String(p.blok).toUpperCase());
+
+  return { ok: true, count: rows.length, data: rows };
+}
+
+// ── PER BLOK ─────────────────────────────────────────────────────────────
+// Membaca tab "perblok" dari spreadsheet History Produksi (SPREADSHEET_ID_PRODUKSI).
+// Kolom penting: KEBUN/ESTATE, AFD, BLOK/KODE_BLOK,
+//   TON/TON_AKTUAL, BUDGET_TON/BUD_TON, SENSUS_TON/SEN_TON,
+//   BJR, JJG, ROTASI/ROT, HA_PANEN/LUAS
+// Filter: tahun (kolom TAHUN/TAHUN_PANEN), kebun, afd, blok
+function getPerblok(p) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID_PRODUKSI);
+  const sh = ss.getSheetByName('perblok');
+  if (!sh) return { ok: true, count: 0, data: [], note: 'Sheet "perblok" tidak ditemukan di History Produksi.' };
+  const lastRow = sh.getLastRow();
+  const lastCol = sh.getLastColumn();
+  if (lastRow < 2 || lastCol < 1) return { ok: true, count: 0, data: [] };
+
+  const headers = sh.getRange(1, 1, 1, lastCol).getValues()[0]
+    .map(h => String(h).trim().toUpperCase().replace(/\s+/g, '_'));
+  const dataRange = sh.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+  // Kolom numerik yang perlu di-parse
+  const NUM_COLS = [
+    'TON','TON_AKTUAL','BUDGET_TON','BUD_TON','RENCANA_TON',
+    'SENSUS_TON','SEN_TON','POTENSI_TON',
+    'BJR','JJG','ROTASI','ROT','HA_PANEN','LUAS_PANEN','LUAS','KG'
+  ];
+
+  let rows = dataRange.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h] = row[i] !== undefined ? row[i] : '';
+    });
+    NUM_COLS.forEach(k => { if (obj[k] !== undefined) obj[k] = parseNum(obj[k]); });
+    return obj;
+  }).filter(o => Object.values(o).some(v => v !== '' && v !== null && v !== 0));
+
+  // Filter tahun — cari di kolom TAHUN, TAHUN_PANEN, PERIODE, atau dari kolom TANGGAL
+  if (p.tahun) {
+    rows = rows.filter(r => {
+      const thn = r.TAHUN || r.TAHUN_PANEN || r.PERIODE || r.YEAR || '';
+      if (thn) return String(thn) === String(p.tahun);
+      // Fallback: cek dari kolom TANGGAL jika ada
+      const tgl = r.TANGGAL || r.TGL || '';
+      if (tgl) {
+        try { return new Date(tgl).getFullYear() === parseInt(p.tahun); } catch(e) { return true; }
+      }
+      return true; // Kalau tidak ada kolom tahun sama sekali, tampilkan semua
+    });
+  }
+  if (p.kebun) rows = rows.filter(r => (String(r.KEBUN||r.ESTATE||'')).toUpperCase() === String(p.kebun).toUpperCase());
+  if (p.afd)   rows = rows.filter(r => (String(r.AFD||'')).toUpperCase() === String(p.afd).toUpperCase());
+  if (p.blok)  rows = rows.filter(r => (String(r.BLOK||r.KODE_BLOK||'')).toUpperCase() === String(p.blok).toUpperCase());
+
+  return { ok: true, count: rows.length, data: rows };
 }
