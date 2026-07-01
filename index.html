@@ -2,14 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>War Room Plantation</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#071510">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WRP">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
@@ -26,12 +22,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;}
-html{background:var(--BG,#081a0e);}
 body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display:flex;}
-.sb{width:220px;min-width:220px;background:linear-gradient(180deg,var(--sb),var(--sb2));height:100vh;position:fixed;top:0;left:0;overflow-y:auto;border-right:1px solid var(--BD);z-index:200;display:flex;flex-direction:column;transition:width .25s;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-left:env(safe-area-inset-left,0px);
-}
+.sb{width:220px;min-width:220px;background:linear-gradient(180deg,var(--sb),var(--sb2));height:100vh;position:fixed;top:0;left:0;overflow-y:auto;border-right:1px solid var(--BD);z-index:200;display:flex;flex-direction:column;transition:width .25s;}
 .sb.col{width:58px;min-width:58px;}
 .sb.col .nav-label,.sb.col .nav-text,.sb.col .brand-name,.sb.col .brand-sub,.sb.col .brand-author,.sb.col .user-name,.sb.col .user-role{display:none;}
 .sb.col .sb-brand{align-items:center;padding:14px 0;}
@@ -57,7 +49,7 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
 .u-av{width:28px;height:28px;background:linear-gradient(135deg,var(--G),#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:600;color:#fff;flex-shrink:0;}
 .user-name{font-size:.7rem;font-weight:500;color:#fff;}
 .user-role{font-size:.57rem;color:var(--Au);}
-.main{margin-left:220px;flex:1;overflow-y:auto;height:100vh;padding:18px;padding-top:calc(18px + env(safe-area-inset-top,0px));padding-right:calc(18px + env(safe-area-inset-right,0px));transition:margin-left .25s;}
+.main{margin-left:220px;flex:1;overflow-y:auto;height:100vh;padding:18px;transition:margin-left .25s;}
 .main.exp{margin-left:58px;}
 .main.solo{margin-left:0;}
 .pg{display:none;animation:fadeIn .22s ease;}
@@ -212,10 +204,7 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
 .empty-state i{font-size:1.6rem;display:block;margin-bottom:8px;color:var(--Y);opacity:.6;}
 .spin{animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.login-wrap{position:fixed;inset:0;background:radial-gradient(circle at 30% 20%,#0f2a18,#040d07 70%);display:flex;align-items:center;justify-content:center;z-index:1000;
-  padding:calc(18px + env(safe-area-inset-top,0px)) calc(18px + env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) calc(18px + env(safe-area-inset-left,0px));
-  box-sizing:border-box;
-}
+.login-wrap{position:fixed;inset:0;background:radial-gradient(circle at 30% 20%,#0f2a18,#040d07 70%);display:flex;align-items:center;justify-content:center;z-index:1000;}
 .login-box{background:linear-gradient(135deg,var(--C1),#071510);border:1px solid var(--BD);border-radius:14px;padding:34px;width:380px;max-width:90vw;}
 .login-logo{width:110px;height:110px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
 .login-logo svg{width:100%;height:100%;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));}
@@ -224,14 +213,9 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
 .login-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:var(--R);font-size:.7rem;padding:8px 11px;border-radius:6px;margin-bottom:12px;display:none;}
 .cfg-note{font-size:.62rem;color:var(--TL);opacity:.5;text-align:center;margin-top:16px;line-height:1.6;}
 .cfg-note a{color:var(--G);cursor:pointer;text-decoration:underline;}
-.solo-wrap{position:fixed;inset:0;background:var(--BG);z-index:400;display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto;
-  padding-top:calc(18px + env(safe-area-inset-top,0px));
-  padding-left:calc(18px + env(safe-area-inset-left,0px));
-  padding-right:calc(18px + env(safe-area-inset-right,0px));
-  padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));
-}
+.solo-wrap{position:fixed;inset:0;background:var(--BG);z-index:400;display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto;}
 .solo-card{max-width:600px;width:100%;}
-.solo-back{position:absolute;top:calc(18px + env(safe-area-inset-top,0px));left:calc(18px + env(safe-area-inset-left,0px));}
+.solo-back{position:absolute;top:18px;left:18px;}
 .collapse-toggle{cursor:pointer;color:var(--G);font-size:.65rem;font-weight:600;display:flex;align-items:center;gap:5px;}
 .collapse-toggle i{transition:transform .2s;}
 .collapse-toggle.open i{transform:rotate(90deg);}
@@ -256,6 +240,9 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
     <div class="fgrp" style="margin-bottom:16px;"><label class="flbl">Password</label><input class="fin" id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn btn-g" style="width:100%;justify-content:center;padding:10px;" onclick="doLogin()" id="li-btn"><i class="fas fa-sign-in-alt"></i> Masuk</button>
     <div class="cfg-note">Belum mengatur koneksi backend? <a onclick="openSoloSettings()">Buka Settings dulu</a></div>
+    <div class="cfg-note" style="margin-top:6px;">Tidak bisa online sama sekali di perangkat ini? <a onclick="document.getElementById('import-db-file').click()">Import database offline (.json)</a></div>
+    <input type="file" id="import-db-file" accept="application/json,.json" style="display:none" onchange="if(this.files&&this.files[0]){importOfflineDbFile(this.files[0]); this.value='';}">
+    <div id="import-db-info" style="display:none;font-size:.62rem;color:var(--G);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:6px;padding:8px 11px;margin-top:10px;line-height:1.6;"></div>
   </div>
 </div>
 
@@ -279,6 +266,30 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
       <p style="font-size:.6rem;color:var(--TL);opacity:.45;line-height:1.6;">
         <i class="fas fa-circle-info"></i> Jika status "Tidak Terhubung", periksa: (1) deployment Apps Script sudah "Anyone" akses, (2) URL diakhiri <code>/exec</code> bukan <code>/dev</code>, (3) fungsi <code>setupSheets</code> sudah dijalankan sekali di editor Apps Script.
       </p>
+    </div>
+    <div class="fc" style="margin-top:14px;margin-bottom:0;">
+      <div class="fc-t"><i class="fas fa-database"></i> Database Offline (Export)</div>
+      <p style="font-size:.68rem;color:var(--TL);opacity:.65;margin-bottom:10px;line-height:1.7;">
+        Untuk perangkat lain yang sama sekali tidak bisa online: sinkronkan semua data di sini (perangkat yang online), export jadi file, lalu import file itu di layar login perangkat yang bermasalah.
+      </p>
+      <div id="sync-all-status-solo" style="display:none;font-size:.62rem;color:var(--TL);opacity:.7;margin-bottom:8px;"></div>
+      <div id="export-db-status-solo" style="display:none;font-size:.62rem;color:var(--G);margin-bottom:8px;"></div>
+      <div class="fa-r">
+        <button class="btn btn-o btn-sm" id="sync-all-btn-solo" onclick="runSyncAllOfflineData('-solo')"><i class="fas fa-cloud-download-alt"></i> Sinkronkan Semua Data</button>
+        <button class="btn btn-g btn-sm" id="export-db-btn-solo" onclick="exportOfflineDb('-solo')"><i class="fas fa-file-export"></i> Export ke File (.json)</button>
+      </div>
+    </div>
+    <div class="fc" style="margin-top:14px;margin-bottom:0;">
+      <div class="fc-t"><i class="fas fa-clock-rotate-left"></i> Antrian Offline (Belum Terkirim)</div>
+      <p style="font-size:.68rem;color:var(--TL);opacity:.65;margin-bottom:10px;line-height:1.7;">
+        Perubahan yang tersimpan di perangkat ini saat tidak ada koneksi (dari sesi login sebelumnya) akan terlihat di sini dan bisa dikirim manual kapan saja, tanpa perlu login dulu.
+      </p>
+      <div id="outbox-summary-solo" class="tw" style="max-height:200px;margin-bottom:10px;"><div class="empty-state" style="padding:14px;"><i class="fas fa-circle-notch spin"></i>Memuat antrian...</div></div>
+      <div class="fa-r">
+        <button class="btn btn-o btn-sm" onclick="refreshOutboxSummary('-solo')"><i class="fas fa-rotate"></i> Refresh</button>
+        <button class="btn btn-g btn-sm" onclick="flushOutbox(true)"><i class="fas fa-paper-plane"></i> Kirim Sekarang</button>
+        <button class="btn btn-r btn-sm" onclick="confirmClearOutbox('-solo')"><i class="fas fa-trash"></i> Hapus Antrian</button>
+      </div>
     </div>
   </div>
 </div>
@@ -318,6 +329,11 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
 <div id="offline-banner" style="display:none;align-items:center;gap:9px;background:linear-gradient(135deg,rgba(245,158,11,.14),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:.68rem;color:var(--Y);">
   <i class="fas fa-wifi-slash"></i>
   <span id="offline-banner-txt">Mode Offline — menampilkan data cache tersimpan.</span>
+</div>
+
+<div id="outbox-banner" style="display:none;align-items:center;gap:9px;justify-content:space-between;background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(59,130,246,.03));border:1px solid rgba(59,130,246,.4);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:.68rem;color:#60a5fa;flex-wrap:wrap;">
+  <div style="display:flex;align-items:center;gap:9px;"><i class="fas fa-clock-rotate-left"></i><span id="outbox-banner-txt">0 perubahan menunggu dikirim ke backend.</span></div>
+  <button class="btn btn-o btn-sm" onclick="flushOutbox(false)"><i class="fas fa-paper-plane"></i> Kirim Sekarang</button>
 </div>
 
 <template id="conn-bar-tpl">
@@ -511,6 +527,27 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
           <button class="btn btn-o btn-sm" onclick="refreshCacheSummary()"><i class="fas fa-rotate"></i> Refresh</button>
           <button class="btn btn-r btn-sm" onclick="confirmClearCache()"><i class="fas fa-trash"></i> Hapus Semua Cache</button>
         </div>
+        <div class="dvd"></div>
+        <p style="font-size:.68rem;color:var(--TL);opacity:.65;margin-bottom:10px;line-height:1.7;">
+          <b>Untuk perangkat yang sama sekali tidak bisa online</b> (mis. domain backend diblokir jaringan setempat): sinkronkan semua data di sini (perangkat yang online), lalu export jadi file dan kirim/import ke perangkat bermasalah lewat layar login.
+        </p>
+        <div id="sync-all-status" style="display:none;font-size:.62rem;color:var(--TL);opacity:.7;margin-bottom:8px;"></div>
+        <div id="export-db-status" style="display:none;font-size:.62rem;color:var(--G);margin-bottom:8px;"></div>
+        <div class="fa-r">
+          <button class="btn btn-o btn-sm" id="sync-all-btn" onclick="runSyncAllOfflineData()"><i class="fas fa-cloud-download-alt"></i> Sinkronkan Semua Data</button>
+          <button class="btn btn-g btn-sm" id="export-db-btn" onclick="exportOfflineDb()"><i class="fas fa-file-export"></i> Export ke File (.json)</button>
+        </div>
+      </div>
+      <div class="fc"><div class="fc-t"><i class="fas fa-clock-rotate-left"></i> Antrian Offline (Belum Terkirim)</div>
+        <p style="font-size:.68rem;color:var(--TL);opacity:.65;margin-bottom:10px;line-height:1.7;">
+          Kalau Anda menambah/mengubah/menghapus data saat tidak ada koneksi ke backend, perubahan itu disimpan di sini dulu (bukan hilang) dan otomatis dikirim begitu koneksi kembali. Anda juga bisa kirim manual kapan saja.
+        </p>
+        <div id="outbox-summary" class="tw" style="max-height:200px;margin-bottom:10px;"><div class="empty-state" style="padding:14px;"><i class="fas fa-circle-notch spin"></i>Memuat antrian...</div></div>
+        <div class="fa-r">
+          <button class="btn btn-o btn-sm" onclick="refreshOutboxSummary()"><i class="fas fa-rotate"></i> Refresh</button>
+          <button class="btn btn-g btn-sm" onclick="flushOutbox(true)"><i class="fas fa-paper-plane"></i> Kirim Sekarang</button>
+          <button class="btn btn-r btn-sm" onclick="confirmClearOutbox()"><i class="fas fa-trash"></i> Hapus Antrian</button>
+        </div>
       </div>
     </div>
   </div>
@@ -693,6 +730,14 @@ function initOfflineDb(){
         session_json TEXT NOT NULL,
         saved_at TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS outbox_store (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        action TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        retry_count INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT
+      );
     `);
     return sqliteDb;
   })();
@@ -744,6 +789,248 @@ async function cacheListSummary(){
   const res = sqliteDb.exec(`SELECT action, COUNT(*), MAX(synced_at) FROM cache_store GROUP BY action ORDER BY action`);
   if(!res.length) return [];
   return res[0].values.map(r=>({ action: r[0], count: r[1], lastSync: r[2] }));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   OUTBOX — antrian tulis (POST) yang gagal karena tidak ada koneksi
+   ────────────────────────────────────────────────────────────────────────
+   Setiap kali api() dipanggil dengan method POST dan fetch() gagal karena
+   masalah JARINGAN (bukan ditolak backend karena data tidak valid), payload
+   itu disimpan di sini. Begitu koneksi kembali (event 'online' browser, atau
+   tes koneksi berhasil, atau tombol "Kirim Sekarang" ditekan), semua item
+   dikirim ulang berurutan (FIFO) ke backend yang sesungguhnya.
+   Item yang DITOLAK backend (validasi gagal, dsb — bukan soal jaringan)
+   TIDAK dimasukkan ke sini, karena mengulang payload yang sama hanya akan
+   gagal lagi; error itu langsung ditampilkan ke user seperti biasa.
+════════════════════════════════════════════════════════════════════════ */
+async function outboxAdd(action, payload){
+  try{
+    await initOfflineDb();
+    sqliteDb.run(
+      `INSERT INTO outbox_store (action, payload_json, created_at) VALUES (?,?,?)`,
+      [action, JSON.stringify(payload), new Date().toISOString()]
+    );
+    schedulePersistOfflineDb();
+    updateOutboxBanner();
+  }catch(e){ console.warn('Gagal menyimpan ke antrian offline:', e); }
+}
+async function outboxCount(){
+  await initOfflineDb();
+  const res = sqliteDb.exec(`SELECT COUNT(*) FROM outbox_store`);
+  return (res.length && res[0].values.length) ? res[0].values[0][0] : 0;
+}
+async function outboxList(){
+  await initOfflineDb();
+  const res = sqliteDb.exec(`SELECT id, action, payload_json, created_at, retry_count, last_error FROM outbox_store ORDER BY id ASC`);
+  if(!res.length) return [];
+  return res[0].values.map(r=>({ id:r[0], action:r[1], payload:JSON.parse(r[2]), createdAt:r[3], retryCount:r[4], lastError:r[5] }));
+}
+async function outboxClearAll(){
+  await initOfflineDb();
+  sqliteDb.run('DELETE FROM outbox_store');
+  schedulePersistOfflineDb();
+  updateOutboxBanner();
+}
+async function updateOutboxBanner(){
+  const n = await outboxCount().catch(()=>0);
+  const banner = document.getElementById('outbox-banner');
+  const txt = document.getElementById('outbox-banner-txt');
+  if(txt) txt.textContent = n + (n===1?' perubahan menunggu dikirim ke backend.':' perubahan menunggu dikirim ke backend.');
+  if(banner) banner.style.display = n>0 ? 'flex' : 'none';
+  if(typeof refreshOutboxSummary === 'function'){
+    if(document.getElementById('outbox-summary')) refreshOutboxSummary('');
+    if(document.getElementById('outbox-summary-solo')) refreshOutboxSummary('-solo');
+  }
+}
+
+let outboxFlushing = false;
+async function flushOutbox(manual=false){
+  if(outboxFlushing) return;
+  if(!API_URL) return;
+  const n0 = await outboxCount().catch(()=>0);
+  if(n0 === 0){ if(manual) showToast('Tidak ada antrian yang perlu dikirim.'); return; }
+  outboxFlushing = true;
+  let flushed = 0;
+  try{
+    await initOfflineDb();
+    while(true){
+      const res = sqliteDb.exec(`SELECT id, action, payload_json FROM outbox_store ORDER BY id ASC LIMIT 1`);
+      if(!res.length || !res[0].values.length) break;
+      const [id, action, payloadJson] = res[0].values[0];
+      const payload = JSON.parse(payloadJson);
+      try{
+        const url = API_URL + '?action=' + encodeURIComponent(action);
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(Object.assign({action}, payload))
+        });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const json = await r.json();
+        if(!json.ok) throw new Error(json.error || 'Backend menolak data ini');
+        sqliteDb.run('DELETE FROM outbox_store WHERE id=?', [id]);
+        schedulePersistOfflineDb();
+        flushed++;
+      }catch(e){
+        // Simpan error terakhir untuk ditampilkan ke user, lalu hentikan (jaga urutan FIFO,
+        // coba lagi dari item ini di kesempatan berikutnya)
+        sqliteDb.run(`UPDATE outbox_store SET retry_count=retry_count+1, last_error=? WHERE id=?`, [String(e.message||e), id]);
+        schedulePersistOfflineDb();
+        break;
+      }
+    }
+  } finally {
+    outboxFlushing = false;
+    await updateOutboxBanner();
+    const remaining = await outboxCount().catch(()=>0);
+    if(flushed>0) showToast(flushed + ' perubahan offline berhasil dikirim ke backend!');
+    else if(manual && remaining>0) showToast('Sebagian antrian gagal dikirim (masih ada masalah). Lihat detail di Settings.', true);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   EXPORT / IMPORT DATABASE OFFLINE
+   ────────────────────────────────────────────────────────────────────────
+   Dipakai saat sebuah perangkat SAMA SEKALI tidak bisa menghubungi backend
+   (mis. domain script.google.com diblokir jaringan setempat). Alurnya:
+   1. Di perangkat yang online (mis. PC), pakai app seperti biasa lalu
+      klik "Export Database Offline" di Settings -> jadi file .json.
+   2. Pindahkan file itu ke perangkat yang bermasalah (WhatsApp/email/dsb).
+   3. Di layar login perangkat bermasalah, klik "Import database offline",
+      pilih file itu. Sesi login & seluruh data ter-cache akan tersalin
+      persis seperti di perangkat asal, sehingga bisa "Masuk" tanpa
+      perlu kontak backend sama sekali (pakai jalur resume-offline yang
+      sudah ada di doLogin()).
+════════════════════════════════════════════════════════════════════════ */
+function bytesToBase64(bytes){
+  let binary = '';
+  const chunkSize = 0x8000;
+  for(let i=0;i<bytes.length;i+=chunkSize){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunkSize));
+  }
+  return btoa(binary);
+}
+function base64ToBytes(b64){
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+// Ambil semua data dari backend (rentang tahun bisa diatur) supaya cache
+// offline selengkap mungkin sebelum di-export. Dipanggil manual saat online.
+async function syncAllOfflineData(onProgress){
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const years = [thisYear-1, thisYear, thisYear+1]; // sesuaikan bila perlu rentang lebih panjang
+  const tasks = [];
+  tasks.push(['getBlok', {}]);
+  tasks.push(['getUsers', {}]);
+  tasks.push(['getPerawatan', {}]);
+  tasks.push(['getHistPupuk', {}]);
+  tasks.push(['getPemupukanBlok', {}]);
+  years.forEach(tahun=>{
+    tasks.push(['getBudget', {tahun}]);
+    tasks.push(['getPerblok', {tahun}]);
+    for(let bulan=1; bulan<=12; bulan++){
+      tasks.push(['getProduksi', {tahun, bulan}]);
+      tasks.push(['getProduksiHarian', {tahun, bulan}]);
+      tasks.push(['getPKS', {tahun, bulan}]);
+      tasks.push(['getPksHarian', {tahun, bulan}]);
+    }
+  });
+  let done = 0, failed = 0;
+  for(const [action, payload] of tasks){
+    try{ await api(action, payload); }catch(e){ failed++; }
+    done++;
+    if(onProgress) onProgress(done, tasks.length, failed);
+  }
+  return { total: tasks.length, failed };
+}
+
+async function runSyncAllOfflineData(suffix=''){
+  const btn = document.getElementById('sync-all-btn'+suffix);
+  const statusEl = document.getElementById('sync-all-status'+suffix);
+  if(!API_URL){ showToast('Backend belum dikonfigurasi.', true); return; }
+  if(btn) btn.disabled = true;
+  if(statusEl) statusEl.style.display = 'block';
+  try{
+    const result = await syncAllOfflineData((done, total, failed)=>{
+      if(statusEl) statusEl.textContent = `Menyinkronkan data... ${done}/${total}` + (failed ? ` (${failed} gagal, dilewati)` : '');
+      if(btn) btn.innerHTML = `<i class="fas fa-circle-notch spin"></i> ${done}/${total}`;
+    });
+    if(statusEl) statusEl.textContent = `Selesai: ${result.total - result.failed}/${result.total} data berhasil disinkronkan` + (result.failed ? ` (${result.failed} gagal/tidak tersedia, dilewati).` : '.');
+    showToast('Sinkronisasi data offline selesai!');
+    if(typeof refreshCacheSummary === 'function') refreshCacheSummary();
+  }catch(e){
+    if(statusEl) statusEl.textContent = 'Gagal sinkronisasi: '+e.message;
+    showToast('Gagal sinkronisasi: '+e.message, true);
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sinkronkan Semua Data'; }
+  }
+}
+
+async function exportOfflineDb(suffix=''){
+  const btn = document.getElementById('export-db-btn'+suffix);
+  const statusEl = document.getElementById('export-db-status'+suffix);
+  try{
+    await initOfflineDb();
+    if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Menyiapkan file...'; }
+    const bytes = sqliteDb.export();
+    const lastUsername = await idbGet('last_username').catch(()=>null);
+    const pkg = {
+      app: 'wrp-offline-package',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      apiUrl: API_URL || '',
+      lastUsername: lastUsername || null,
+      sqliteBase64: bytesToBase64(bytes)
+    };
+    const blob = new Blob([JSON.stringify(pkg)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'wrp-offline-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if(statusEl){ statusEl.style.display='block'; statusEl.textContent = 'File berhasil dibuat (' + (blob.size/1024/1024).toFixed(2) + ' MB). Kirim file ini ke perangkat yang tidak bisa online, lalu import di layar login.'; }
+    showToast('Database offline berhasil diexport!');
+  }catch(e){
+    if(statusEl){ statusEl.style.display='block'; statusEl.textContent = 'Gagal export: '+e.message; }
+    showToast('Gagal export database offline: '+e.message, true);
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-export"></i> Export ke File (.json)'; }
+  }
+}
+
+async function importOfflineDbFile(file){
+  const infoEl = document.getElementById('import-db-info');
+  try{
+    const text = await file.text();
+    const pkg = JSON.parse(text);
+    if(!pkg || !pkg.sqliteBase64) throw new Error('File tidak valid / bukan file export War Room Plantation.');
+    const bytes = base64ToBytes(pkg.sqliteBase64);
+    if(!SQL){ SQL = await initSqlJs({ locateFile: f => SQLJS_CDN + f }); }
+    const importedDb = new SQL.Database(bytes); // akan throw kalau file rusak/bukan sqlite
+    await idbSet('sqlite_main', bytes);
+    sqliteDb = importedDb;
+    offlineDbReady = Promise.resolve(sqliteDb);
+    if(pkg.lastUsername) await idbSet('last_username', pkg.lastUsername);
+    if(pkg.apiUrl){ API_URL = pkg.apiUrl; await kvSet('wrp_api_url', pkg.apiUrl); }
+    const res = sqliteDb.exec('SELECT username FROM session_store');
+    const users = res.length ? res[0].values.map(r=>r[0]) : [];
+    if(infoEl){
+      infoEl.style.display = 'block';
+      infoEl.innerHTML = users.length
+        ? 'Import berhasil! Sesi ditemukan untuk: <b>'+users.join(', ')+'</b>. Isi username di atas (password bebas — tidak diverifikasi ulang tanpa internet) lalu klik "Masuk".'
+        : 'Import berhasil, tapi file ini tidak berisi sesi login tersimpan — Anda tetap perlu login online minimal sekali sebelum bisa dipakai offline.';
+    }
+    if(users.length===1) document.getElementById('li-user').value = users[0];
+    showToast('Database offline berhasil diimport!');
+  }catch(e){
+    if(infoEl){ infoEl.style.display='block'; infoEl.style.color='var(--R)'; infoEl.style.background='rgba(239,68,68,.08)'; infoEl.style.borderColor='rgba(239,68,68,.3)'; infoEl.textContent = 'Gagal import: '+e.message; }
+    showToast('Gagal import database offline: '+e.message, true);
+  }
 }
 
 async function saveOfflineSession(user){
@@ -819,6 +1106,25 @@ function confirmClearCache(){
     .catch(e=>showToast('Gagal menghapus cache: '+e.message, true));
 }
 
+async function refreshOutboxSummary(suffix=''){
+  const el = document.getElementById('outbox-summary'+suffix);
+  if(!el) return;
+  try{
+    const rows = await outboxList();
+    if(!rows.length){ el.innerHTML = '<div class="empty-state" style="padding:14px;"><i class="fas fa-inbox"></i>Tidak ada antrian. Semua perubahan sudah tersinkron ke backend.</div>'; return; }
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Aksi</th><th>Dibuat</th><th>Percobaan</th><th>Error terakhir</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${escHtml(r.action)}</td><td>${new Date(r.createdAt).toLocaleString('id-ID')}</td><td>${r.retryCount}</td><td style="color:var(--R);">${r.lastError?escHtml(r.lastError):'-'}</td></tr>`).join('')}
+      </tbody></table>`;
+  }catch(e){
+    el.innerHTML = '<div class="empty-state" style="padding:14px;"><i class="fas fa-triangle-exclamation"></i>Gagal memuat antrian: '+escHtml(e.message)+'</div>';
+  }
+}
+function confirmClearOutbox(suffix=''){
+  if(!confirm('Hapus SEMUA antrian offline yang belum terkirim? Perubahan yang belum tersinkron akan HILANG PERMANEN dan tidak akan pernah masuk ke Google Sheets. Gunakan ini hanya kalau Anda yakin datanya sudah tidak relevan lagi.')) return;
+  outboxClearAll().then(()=>{ showToast('Antrian offline dihapus.'); refreshOutboxSummary(suffix); })
+    .catch(e=>showToast('Gagal menghapus antrian: '+e.message, true));
+}
+
 /* ════════════════════════════════════════════════════════════════════════
    CONFIG STORAGE
 ════════════════════════════════════════════════════════════════════════ */
@@ -849,17 +1155,26 @@ async function saveConfig(isSolo){
 ════════════════════════════════════════════════════════════════════════ */
 async function api(action, payload={}, method='GET'){
   const isRead = method === 'GET' && action.indexOf('get') === 0; // getProduksi, getPKS, dst — aman di-cache & dibaca offline
+  const isQueueablePost = method === 'POST' && action !== 'login' && action !== 'ping'; // write asli, aman diantrikan
   const tryOfflineFallback = async ()=>{
     if(!isRead) return null;
     const cached = await cacheGet(action, payload).catch(()=>null);
     if(cached){ showOfflineBanner(cached.syncedAt); return Object.assign({}, cached.data, {_offline:true, _syncedAt:cached.syncedAt}); }
     return null;
   };
+  const queueOrThrow = async (baseMsg)=>{
+    if(isQueueablePost){
+      await outboxAdd(action, payload);
+      const n = await outboxCount();
+      throw new Error('Tidak ada koneksi ke backend. Perubahan ini sudah disimpan di antrian offline (' + n + ' item menunggu) dan akan otomatis terkirim begitu online lagi.');
+    }
+    throw new Error(baseMsg);
+  };
 
   if(!API_URL){
     const fallback = await tryOfflineFallback();
     if(fallback) return fallback;
-    throw new Error('Backend belum dikonfigurasi. Buka Settings dan masukkan URL Apps Script.');
+    await queueOrThrow('Backend belum dikonfigurasi. Buka Settings dan masukkan URL Apps Script.');
   }
   let url = API_URL + '?action=' + encodeURIComponent(action);
   let opts = { method: 'GET' };
@@ -880,7 +1195,7 @@ async function api(action, payload={}, method='GET'){
   }catch(networkErr){
     const fallback = await tryOfflineFallback();
     if(fallback) return fallback;
-    throw new Error('Tidak bisa menghubungi backend. Kemungkinan: (1) URL salah, (2) deployment belum "Anyone" akses, (3) backend belum redeploy setelah update kode. Detail: '+networkErr.message);
+    await queueOrThrow('Tidak bisa menghubungi backend. Kemungkinan: (1) URL salah, (2) deployment belum "Anyone" akses, (3) backend belum redeploy setelah update kode. Detail: '+networkErr.message);
   }
   if(!res.ok){
     const fallback = await tryOfflineFallback();
@@ -907,6 +1222,7 @@ async function testConnection(manual=false){
     const r = await api('ping');
     setConnUI('ok', 'Terhubung · '+ new Date(r.time).toLocaleTimeString('id-ID'));
     if(manual) showToast('Koneksi backend berhasil!');
+    flushOutbox(false); // fire-and-forget: kirim antrian offline kalau ada
     return true;
   }catch(e){
     const diag = await diagnoseConnectionFailure();
@@ -971,6 +1287,7 @@ function openSoloSettings(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('solo-settings').style.display='flex';
   setConnUI(connStatus);
+  if(typeof refreshOutboxSummary === 'function') refreshOutboxSummary('-solo');
 }
 function closeSoloSettings(){
   document.getElementById('solo-settings').style.display='none';
@@ -2850,7 +3167,7 @@ function render(id){
   else if(id==='pks') loadPKS();
   else if(id==='perawatan') loadPerawatan();
   else if(id==='audit') loadAudit();
-  else if(id==='settings') refreshCacheSummary();
+  else if(id==='settings'){ refreshCacheSummary(); refreshOutboxSummary(); }
 }
 
 window.addEventListener('DOMContentLoaded', async ()=>{
@@ -2859,6 +3176,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   registerServiceWorker();
   await loadConfig();
   setConnUI('unknown');
+  updateOutboxBanner(); // tampilkan badge antrian offline (kalau ada) sejak awal, sebelum tes koneksi
   let online = false;
   if(API_URL) online = await testConnection(false);
   if(!online){
@@ -2877,6 +3195,10 @@ window.addEventListener('DOMContentLoaded', async ()=>{
     }catch(e){ /* tidak ada sesi offline tersimpan, tetap tampilkan layar login biasa */ }
   }
 });
+
+// Begitu browser mendeteksi koneksi kembali, coba tes ulang backend —
+// kalau berhasil, testConnection() otomatis memicu flushOutbox() (lihat di atas).
+window.addEventListener('online', ()=>{ if(API_URL) testConnection(false); });
 
 function installLogos(){
   const tpl = document.getElementById('wrp-logo-tpl');
