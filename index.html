@@ -305,9 +305,11 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
 </div>
 
 <template id="conn-bar-tpl">
-  <div class="conn-bar">
+  <div class="conn-bar" style="flex-wrap:wrap;">
     <div class="conn-l"><span class="dot" id="conn-dot"></span><span id="conn-text">Memeriksa koneksi backend...</span></div>
-    <button class="btn btn-o btn-sm" onclick="testConnection(true)"><i class="fas fa-sync-alt"></i> Cek Ulang</button>
+    <div class="conn-r" style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn btn-o btn-sm" onclick="testConnection(true)"><i class="fas fa-sync-alt"></i> Cek Ulang</button>
+    </div>
   </div>
 </template>
 
@@ -891,9 +893,35 @@ async function testConnection(manual=false){
     if(manual) showToast('Koneksi backend berhasil!');
     return true;
   }catch(e){
-    setConnUI('fail', e.message);
-    if(manual) showToast('Koneksi gagal: '+e.message, true);
+    const diag = await diagnoseConnectionFailure();
+    setConnUI('fail', diag);
+    if(manual) showToast('Koneksi gagal: '+diag, true);
     return false;
+  }
+}
+
+/* Diagnosa lanjutan saat fetch() gagal total (Failed to fetch).
+   Membedakan 3 kemungkinan akar masalah supaya pesan ke user lebih jelas
+   daripada sekadar "Failed to fetch". */
+async function diagnoseConnectionFailure(){
+  if(typeof navigator!=='undefined' && navigator.onLine===false){
+    return 'Perangkat tidak terhubung ke internet. Periksa koneksi WiFi/data seluler lalu coba lagi.';
+  }
+  // Probe dengan mode 'no-cors': request ini TIDAK melempar error karena alasan CORS,
+  // ia hanya gagal kalau server benar-benar tidak terjangkau (DNS/URL salah/offline).
+  // Kalau probe ini berhasil tapi fetch normal di atas tetap gagal, artinya server
+  // MERESPONS tapi browser diblokir membaca hasilnya -> hampir selalu karena request
+  // dialihkan ke halaman login Google (deployment access belum "Anyone").
+  try{
+    await fetch(API_URL + '?action=ping', { mode:'no-cors', cache:'no-store' });
+    return 'Server merespons, tapi browser tidak diizinkan membaca hasilnya. Penyebab paling umum: '
+         + 'deployment Apps Script di-set "Anyone with Google account" (harus "Anyone" saja), sehingga '
+         + 'request dialihkan ke halaman login Google. Buka Apps Script → Manage deployments → Edit → '
+         + 'Who has access: Anyone → Deploy ulang (New version).';
+  }catch(probeErr){
+    return 'Server tidak terjangkau sama sekali. Kemungkinan: (1) URL salah/ketik keliru, (2) URL memakai '
+         + '/dev bukan /exec, (3) deployment sudah dihapus/diganti, (4) app ini tidak punya izin akses internet. '
+         + 'Gunakan tombol "Buka URL di Browser" di bawah untuk memastikan.';
   }
 }
 function setConnUI(status, text){
@@ -905,7 +933,17 @@ function setConnUI(status, text){
     const txt = tpl.querySelector('#conn-text');
     if(status==='ok'){ dot.className='dot on'; txt.textContent = text || 'Terhubung ke Google Sheets'; }
     else if(status==='checking'){ dot.className='dot busy'; txt.textContent = 'Memeriksa koneksi...'; }
-    else { dot.className='dot off'; txt.textContent = text || 'Tidak terhubung — buka Settings untuk konfigurasi'; }
+    else {
+      dot.className='dot off';
+      txt.textContent = text || 'Tidak terhubung — buka Settings untuk konfigurasi';
+      if(API_URL){
+        const openBtn = document.createElement('button');
+        openBtn.className = 'btn btn-o btn-sm';
+        openBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Buka URL di Browser';
+        openBtn.onclick = ()=> window.open(API_URL + '?action=ping', '_blank');
+        tpl.querySelector('.conn-r').appendChild(openBtn);
+      }
+    }
     slot.appendChild(tpl);
   });
 }
