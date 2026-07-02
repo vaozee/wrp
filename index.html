@@ -631,6 +631,7 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
    STATE
 ════════════════════════════════════════════════════════════════════════ */
 let API_URL = '';
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyPMQsQqAHk4iBt-v4xfWsFKdY9Fbn9C6jEGTAtBVlSpDb3k_xcZmpC3hid2J3gHGIy/exec';
 let currentUser = null;
 let connStatus = 'unknown';
 let dashRows = [], blokRows = [], budgetRows = [], userRows = [], auditRows = [], pksRows = [], pksHarianRows = [];
@@ -1133,6 +1134,7 @@ async function loadConfig(){
     const v = await kvGet('wrp_api_url');
     if(v) API_URL = v;
   }catch(e){}
+  if(!API_URL) API_URL = DEFAULT_API_URL; // isi otomatis kolom tes koneksi kalau belum pernah diatur
   document.getElementById('cfg-url').value = API_URL;
   document.getElementById('cfg-url-solo').value = API_URL;
 }
