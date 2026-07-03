@@ -2736,18 +2736,40 @@ function renderPerawatan(){
     });
     const pbList = Object.entries(byJenisPb);
     html += `<div class="cc" style="margin-bottom:14px;"><div class="cc-t"><i class="fas fa-chart-column"></i> Rekom Total vs Realisasi 2024/2025/2026 per Jenis Pupuk</div><div id="ch-pupuk-blok"></div></div>
-    <div class="cc"><div class="cc-t"><span class="l"><i class="fas fa-table-list"></i> Tabel Pemupukan Blok per Jenis</span></div>
-      <div class="tw" style="max-height:300px;"><table class="tbl"><thead><tr>
-        <th>Jenis Pupuk</th><th>Rekom Total (Kg)</th><th>Realisasi 2026</th><th>Realisasi 2025</th><th>Realisasi 2024</th><th>Ach 2026 (%)</th>
+    <div class="cc"><div class="cc-t"><span class="l"><i class="fas fa-table-list"></i> Tabel Pemupukan Blok — Detail per Blok</span></div>
+      <div class="tw" style="max-height:340px;"><table class="tbl"><thead><tr>
+        <th>AFD</th><th>Blok</th><th>Luas (Ha)</th><th>Populasi</th><th>Jenis Pupuk</th>
+        <th>Rekom Total (Kg)</th><th>Kg/Rotasi 1</th><th>Kg/Rotasi 2</th><th>Kg/Rotasi 3</th>
+        <th>Realisasi 2026</th><th>Ach 2026 (%)</th><th>Realisasi 2025</th><th>Realisasi 2024</th>
       </tr></thead><tbody>
-      ${pbList.map(([j,v])=>{
-        const a26=v.rekom>0?(v.real2026/v.rekom*100):0;
-        return `<tr><td><b>${escHtml(j)}</b></td>
-          <td>${Math.round(v.rekom).toLocaleString('id-ID')}</td>
-          <td>${Math.round(v.real2026).toLocaleString('id-ID')}</td>
-          <td>${Math.round(v.real2025).toLocaleString('id-ID')}</td>
-          <td>${Math.round(v.real2024).toLocaleString('id-ID')}</td>
-          <td class="${a26>=95?'g':a26>=80?'wd':'bd'}">${a26.toFixed(1)}%</td></tr>`;
+      ${pb.slice(0,500).map(r=>{
+        const luas     = rowNum(r,'LUAS_(HA)','LUAS_HA','LUAS (HA)','LUAS','luas_(ha)','luas_ha','luas');
+        const populasi = rowNum(r,'POPULASI','populasi');
+        const jenis    = rowGet(r,'JENIS_PUPUK','jenis_pupuk','JENIS','jenis')||'-';
+        const rekom    = rowNum(r,'REKOM_TOTAL_KG','rekom_total_kg','REKOM_TOTAL','rekom_total');
+        const rot1     = rowNum(r,'KG/_ROTASI_1','KG_ROTASI_1','KG/ROTASI_1','kg/_rotasi_1','rotasi_1');
+        const rot2     = rowNum(r,'KG/_ROTASI_2','KG_ROTASI_2','KG/ROTASI_2','kg/_rotasi_2','rotasi_2');
+        const rot3     = rowNum(r,'KG/_ROTASI_3','KG_ROTASI_3','KG/ROTASI_3','kg/_rotasi_3','rotasi_3');
+        const real26   = rowNum(r,'REALISASI_KG_2026','realisasi_kg_2026');
+        const real25   = rowNum(r,'REALISASI_KG_2025','realisasi_kg_2025');
+        const real24   = rowNum(r,'REALISASI_KG_2024','realisasi_kg_2024');
+        const achRaw   = rowGet(r,'Ach 2026 (%)','ACH_2026_(%)','ach_2026_(%)','ACH_2026','ach_2026');
+        const ach      = achRaw!==''? (parseFloat(String(achRaw).replace('%','').replace(',','.'))||0) : (rekom>0?(real26/rekom*100):0);
+        return `<tr>
+          <td>${escHtml(rowGet(r,'AFD','afd'))}</td>
+          <td>${escHtml(rowGet(r,'BLOK','blok','KODE_BLOK'))}</td>
+          <td>${luas?luas.toLocaleString('id-ID'):'-'}</td>
+          <td>${populasi?Math.round(populasi).toLocaleString('id-ID'):'-'}</td>
+          <td><b>${escHtml(jenis)}</b></td>
+          <td>${Math.round(rekom).toLocaleString('id-ID')}</td>
+          <td>${Math.round(rot1).toLocaleString('id-ID')}</td>
+          <td>${Math.round(rot2).toLocaleString('id-ID')}</td>
+          <td>${Math.round(rot3).toLocaleString('id-ID')}</td>
+          <td>${Math.round(real26).toLocaleString('id-ID')}</td>
+          <td class="${ach>=95?'g':ach>=80?'wd':'bd'}">${ach.toFixed(1)}%</td>
+          <td>${Math.round(real25).toLocaleString('id-ID')}</td>
+          <td>${Math.round(real24).toLocaleString('id-ID')}</td>
+        </tr>`;
       }).join('')}
       </tbody></table></div></div>`;
   } else {
