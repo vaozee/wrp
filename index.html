@@ -305,6 +305,7 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
   </div>
   <nav>
     <a class="nav-item active" data-page="dashboard" onclick="go('dashboard',this)"><i class="fas fa-seedling"></i><span class="nav-text">Produksi</span></a>
+    <a class="nav-item" data-page="perkebun" onclick="go('perkebun',this)"><i class="fas fa-city"></i><span class="nav-text">Per Kebun</span></a>
     <a class="nav-item" data-page="perblok" onclick="go('perblok',this)"><i class="fas fa-map"></i><span class="nav-text">Per Blok</span></a>
     <a class="nav-item" data-page="import" data-role-restricted="1" onclick="go('import',this)"><i class="fas fa-file-import"></i><span class="nav-text">Import Produksi</span></a>
     <a class="nav-item" data-page="mblok" data-role-restricted="1" onclick="go('mblok',this)"><i class="fas fa-th-large"></i><span class="nav-text">Master Blok</span></a>
@@ -315,7 +316,7 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
     <a class="nav-item" data-page="perawatan" onclick="go('perawatan',this)"><i class="fas fa-leaf"></i><span class="nav-text">Perawatan</span></a>
     <a class="nav-item" data-page="audit" onclick="go('audit',this)"><i class="fas fa-shield-alt"></i><span class="nav-text">Audit Trail</span></a>
     <div class="nav-label">Sistem</div>
-    <a class="nav-item" data-page="settings" data-role-restricted="1" onclick="go('settings',this)"><i class="fas fa-cog"></i><span class="nav-text">Settings</span></a>
+    <a class="nav-item" data-page="settings" onclick="go('settings',this)"><i class="fas fa-cog"></i><span class="nav-text">Settings</span></a>
   </nav>
   <div class="sb-user">
     <div class="u-av" id="u-av">--</div>
@@ -360,12 +361,26 @@ body{font-family:'Roboto',sans-serif;background:var(--BG);color:var(--T);display
   <div class="pf">v2.1 Connected Edition · Google Sheets Backend</div>
 </section>
 
+<!-- PAGE: PER KEBUN -->
+<section class="pg" id="pg-perkebun">
+  <div class="topbar"><div class="tb-left"><button class="tog-sb" onclick="toggleSB()"><i class="fas fa-bars"></i></button><div><h1>Per Kebun</h1><p>Monitoring produksi TBS per Kebun dari Google Sheets "History Produksi"</p></div></div>
+  <div class="h-actions">
+    <select class="fsl" id="pk-tahun" style="width:90px;" onchange="loadPerKebun()"></select>
+    <select class="fsl" id="pk-bulan" style="width:130px;" onchange="loadPerKebun()"></select>
+    <select class="fsl" id="pk-kebun" style="width:130px;" onchange="onPkKebunChange()"><option value="">Semua Kebun</option></select>
+    <button class="btn btn-o" onclick="loadPerKebun()"><i class="fas fa-sync-alt"></i> Refresh</button>
+    <button class="btn btn-g" onclick="exportCSV(pkRows,'per_kebun')"><i class="fas fa-file-csv"></i> Export CSV</button>
+  </div></div>
+  <div class="conn-bar-slot"></div>
+  <div id="pk-content"><div class="empty-state"><i class="fas fa-circle-notch spin"></i>Memuat data dari Google Sheets...</div></div>
+  <div class="pf">v2.1 Connected Edition · Google Sheets Backend</div>
+</section>
+
 <!-- PAGE: PER BLOK -->
 <section class="pg" id="pg-perblok">
   <div class="topbar"><div class="tb-left"><button class="tog-sb" onclick="toggleSB()"><i class="fas fa-bars"></i></button><div><h1>Per Blok</h1><p>Analisa produksi per blok dari sheet "perblok" History Produksi</p></div></div>
   <div class="h-actions">
     <select class="fsl" id="pb-tahun" style="width:90px;" onchange="loadPerblok()"></select>
-    <select class="fsl" id="pb-kebun" style="width:130px;" onchange="onPbKebunChange()"><option value="">Semua Kebun</option></select>
     <select class="fsl" id="pb-afd" style="width:110px;" onchange="onPbAfdChange()"><option value="">Semua AFD</option></select>
     <select class="fsl" id="pb-blok" style="width:115px;" onchange="renderPerblok()"><option value="">Semua Blok</option></select>
     <button class="btn btn-o" onclick="loadPerblok()"><i class="fas fa-sync-alt"></i> Refresh</button>
@@ -647,7 +662,7 @@ const yA=f=>({labels:{formatter:f,style:{colors:TL,fontSize:'10px'}}});
 const BULAN_NAMA = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
 // Halaman yang TIDAK BOLEH diakses sama sekali oleh role Viewer
-const VIEWER_BLOCKED_PAGES = ['import','mblok','muser','settings'];
+const VIEWER_BLOCKED_PAGES = ['import','mblok','muser'];
 
 /* ════════════════════════════════════════════════════════════════════════
    OFFLINE DB — SQLite (sql.js/WASM) dipersist ke IndexedDB
@@ -1470,6 +1485,8 @@ function populateYearMonthFilters(){
   document.getElementById('pks-bulan').innerHTML = mOpts;
   document.getElementById('bud-tahun-f').innerHTML = yOpts;
   document.getElementById('pb-tahun').innerHTML = yOpts;
+  document.getElementById('pk-tahun').innerHTML = ySel.innerHTML;
+  document.getElementById('pk-bulan').innerHTML = mOpts;
 }
 
 // all raw data
@@ -1748,6 +1765,144 @@ function toggleRawTable(){
   tgl.innerHTML = showing
     ? '<i class="fas fa-chevron-right"></i> <i class="fas fa-table-list"></i> Data Mentah (Raw rows dari Sheet) — klik untuk tampilkan'
     : '<i class="fas fa-chevron-down"></i> <i class="fas fa-table-list"></i> Data Mentah (Raw rows dari Sheet) — klik untuk sembunyikan';
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PER KEBUN — setara Dashboard Produksi, filter hanya Tahun/Bulan/Kebun
+════════════════════════════════════════════════════════════════════════ */
+let pkAllRows = [], pkAllHarianRows = [], pkRows = [];
+
+function populatePkKebunFilter(rows){
+  const kebunSel = document.getElementById('pk-kebun');
+  const curKebun = kebunSel.value;
+  const kebuns = [...new Set(rows.map(r=>r.KEBUN).filter(Boolean))].sort();
+  kebunSel.innerHTML = '<option value="">Semua Kebun</option>' +
+    kebuns.map(k=>`<option value="${k}" ${k===curKebun?'selected':''}>${k}</option>`).join('');
+}
+
+function onPkKebunChange(){
+  applyPkFilter();
+}
+
+function applyPkFilter(){
+  const kebun = document.getElementById('pk-kebun').value;
+  const tahun = document.getElementById('pk-tahun').value;
+  const bulan = document.getElementById('pk-bulan').value;
+  let rows       = pkAllRows;
+  let harianRows = pkAllHarianRows;
+  if(kebun){ rows = rows.filter(r=>String(r.KEBUN)===kebun); harianRows = harianRows.filter(r=>String(r.kebun||r.KEBUN||'')===kebun); }
+  pkRows = rows;
+  if(!rows.length){
+    document.getElementById('pk-content').innerHTML='<div class="empty-state"><i class="fas fa-folder-open"></i>Tidak ada data untuk filter yang dipilih.</div>';
+    return;
+  }
+  const hasTanggalData = harianRows.some(r=>r.tanggal);
+  renderPerKebun(rows, harianRows, hasTanggalData, tahun, bulan);
+}
+
+async function loadPerKebun(){
+  const el = document.getElementById('pk-content');
+  el.innerHTML = '<div class="empty-state"><i class="fas fa-circle-notch spin"></i>Memuat data dari Google Sheets...</div>';
+  if(!API_URL){
+    el.innerHTML = `<div class="empty-state"><i class="fas fa-plug-circle-xmark"></i>Backend belum terhubung.${isViewer()?'':' <br><br><button class="btn btn-g" onclick="go(\'settings\')"><i class="fas fa-cog"></i> Buka Settings</button>'}</div>`;
+    return;
+  }
+  const tahun = document.getElementById('pk-tahun').value;
+  const bulan = document.getElementById('pk-bulan').value;
+  try{
+    const [rProd, rHarian] = await Promise.all([
+      api('getProduksi', {tahun, bulan}),
+      api('getProduksiHarian', {tahun, bulan})
+    ]);
+    pkAllRows       = rProd.data;
+    pkAllHarianRows = rHarian.data;
+    if(!pkAllRows.length){
+      el.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i>Tidak ada data produksi untuk periode ini di sheet.</div>';
+      document.getElementById('pk-kebun').innerHTML='<option value="">Semua Kebun</option>';
+      return;
+    }
+    populatePkKebunFilter(pkAllRows);
+    applyPkFilter();
+  }catch(e){
+    el.innerHTML = `<div class="empty-state"><i class="fas fa-triangle-exclamation"></i>Gagal memuat data: ${escHtml(e.message)}<br><br><button class="btn btn-o btn-sm" onclick="loadPerKebun()"><i class="fas fa-sync-alt"></i> Coba Lagi</button></div>`;
+  }
+}
+
+function renderPerKebun(rows, harianRows, hasTanggalData, tahun, bulan){
+  const el = document.getElementById('pk-content');
+  const totJJG = rows.reduce((a,r)=>a+r.JJG,0);
+  const totKG = rows.reduce((a,r)=>a+r.KG,0);
+  const totHK = rows.reduce((a,r)=>a+r.HK,0);
+  const totBudget = rows.reduce((a,r)=>a+r.BUDGET_KG,0);
+  const totSensus = rows.reduce((a,r)=>a+r.SENSUS_KG,0);
+  const totRestan = harianRows.reduce((a,r)=>a+(r.restanKg||0),0);
+  const avgBJR = rows.filter(r=>r.BJR>0).length ? (rows.reduce((a,r)=>a+r.BJR,0)/rows.filter(r=>r.BJR>0).length) : 0;
+  const ach = totBudget>0 ? (totKG/totBudget*100) : 0;
+
+  const byKebun = {};
+  rows.forEach(r=>{
+    if(!byKebun[r.KEBUN]) byKebun[r.KEBUN] = {ac:0,b:0,sen:0,jjg:0,hk:0,bjrList:[],afds:new Set()};
+    byKebun[r.KEBUN].ac += r.KG;
+    byKebun[r.KEBUN].b += r.BUDGET_KG;
+    byKebun[r.KEBUN].sen += r.SENSUS_KG;
+    byKebun[r.KEBUN].jjg += r.JJG;
+    byKebun[r.KEBUN].hk += r.HK;
+    if(r.BJR>0) byKebun[r.KEBUN].bjrList.push(r.BJR);
+    byKebun[r.KEBUN].afds.add(r.AFD);
+  });
+  const kebunArr = Object.entries(byKebun).map(([k,v])=>({
+    kebun:k, ac:v.ac, b:v.b, sen:v.sen, jjg:v.jjg, hk:v.hk, afdCount:v.afds.size,
+    bjr: v.bjrList.length ? v.bjrList.reduce((a,b)=>a+b,0)/v.bjrList.length : 0
+  })).sort((a,b)=>a.kebun.localeCompare(b.kebun));
+
+  const calc = calcExecAlert(rows, harianRows, tahun, bulan);
+
+  el.innerHTML = `
+    <div class="pbar"><div class="pbar-l"><i class="fas fa-city"></i><div><div class="p-lbl">Periode Data</div><div class="p-date">${bulan?BULAN_NAMA[bulan]:'Semua Bulan'} ${tahun}</div></div></div><span class="bdg bdg-g">${rows.length} baris dari Sheet · ${kebunArr.length} kebun</span></div>
+    ${renderExecAlertHtml(calc)}
+    <div class="kg7">
+      <div class="kc"><div class="ksmi" style="background:rgba(34,197,94,.15);"><i class="fas fa-seedling" style="color:var(--G);font-size:.7rem;"></i></div><div class="klbl">Total JJG</div><div class="kv">${Math.round(totJJG).toLocaleString('id-ID')}</div></div>
+      <div class="kc"><div class="ksmi" style="background:rgba(34,197,94,.15);"><i class="fas fa-weight-hanging" style="color:var(--G);font-size:.7rem;"></i></div><div class="klbl">Total KG</div><div class="kv w">${Math.round(totKG).toLocaleString('id-ID')}</div></div>
+      <div class="kc"><div class="ksmi" style="background:rgba(239,68,68,.15);"><i class="fas fa-box-open" style="color:var(--R);font-size:.7rem;"></i></div><div class="klbl">Restan KG</div><div class="kv r">${Math.round(totRestan).toLocaleString('id-ID')}</div></div>
+      <div class="kc"><div class="ksmi" style="background:rgba(59,130,246,.15);"><i class="fas fa-chart-pie" style="color:var(--BL);font-size:.7rem;"></i></div><div class="klbl">Sensus KG</div><div class="kv b">${Math.round(totSensus).toLocaleString('id-ID')}</div></div>
+      <div class="kc"><div class="ksmi" style="background:rgba(34,197,94,.15);"><i class="fas fa-percentage" style="color:var(--G);font-size:.7rem;"></i></div><div class="klbl">Achievement</div><div class="kv ${ach>=95?'':'y'}">${ach.toFixed(1)}%</div></div>
+      <div class="kc"><div class="ksmi" style="background:rgba(245,158,11,.15);"><i class="fas fa-balance-scale" style="color:var(--Y);font-size:.7rem;"></i></div><div class="klbl">Rata BJR</div><div class="kv">${avgBJR.toFixed(2)} Kg</div></div>
+      <div class="kc"><div class="ksmi" style="background:rgba(239,68,68,.15);"><i class="fas fa-users" style="color:var(--R);font-size:.7rem;"></i></div><div class="klbl">Total HK</div><div class="kv r">${Math.round(totHK).toLocaleString('id-ID')}</div></div>
+    </div>
+    ${hasTanggalData ? `<div class="cc"><div class="cc-t"><i class="fas fa-chart-area"></i> Trend Produksi & Restan KG Harian</div><div id="ch-pkh"></div></div>` :
+      `<div class="cc"><div class="cc-t"><i class="fas fa-chart-area"></i> Trend Produksi Harian</div><div class="empty-state"><i class="fas fa-calendar-xmark"></i>Belum ada data dengan kolom TANGGAL terisi.</div></div>`}
+    <div class="gr2">
+      <div class="cc"><div class="cc-t"><i class="fas fa-building"></i> Aktual vs Budget per Kebun</div><div id="ch-pke"></div></div>
+      <div class="cc"><div class="cc-t"><span class="l"><i class="fas fa-table"></i> Detail per Kebun</span><span style="font-size:.6rem;opacity:.5;">${kebunArr.length} kebun</span></div>
+        <div class="tw" style="max-height:240px;"><table class="tbl"><thead><tr><th>Kebun</th><th>Jml AFD</th><th>Aktual (Kg)</th><th>Budget (Kg)</th><th>Ach%</th><th>Rata BJR</th></tr></thead><tbody>
+        ${kebunArr.map(r=>{const p=r.b>0?(r.ac/r.b*100):0; const cl=p>=95?'g':p>=85?'wd':'bd';
+          return `<tr><td><b>${escHtml(r.kebun)}</b></td><td>${r.afdCount}</td><td>${Math.round(r.ac).toLocaleString('id-ID')}</td><td>${Math.round(r.b).toLocaleString('id-ID')}</td><td class="${cl}">${p.toFixed(1)}%</td><td>${r.bjr.toFixed(2)}</td></tr>`;
+        }).join('')}
+        </tbody></table></div>
+      </div>
+    </div>
+  `;
+
+  if(hasTanggalData && harianRows.length){
+    new ApexCharts(document.getElementById('ch-pkh'),{chart:{...bC,type:'area',height:220},
+      series:[
+        {name:'Produksi (Kg)',data:harianRows.map(r=>Math.round(r.kg))},
+        {name:'Restan KG',data:harianRows.map(r=>Math.round(r.restanKg||0))}
+      ],
+      dataLabels:{enabled:false},stroke:{curve:'smooth',width:[2,2],dashArray:[0,4]},
+      fill:{type:'gradient',gradient:{colorStops:[{offset:0,color:G,opacity:.3},{offset:100,color:'#081a0e',opacity:.04}]}},
+      xaxis:xA(harianRows.map(r=>r.tanggal.substring(8,10)+'/'+r.tanggal.substring(5,7))),
+      yaxis:yA(v=>(v/1000).toFixed(0)+'K'),
+      tooltip:{theme:'dark',y:{formatter:v=>v.toLocaleString('id-ID')+' Kg'}},
+      colors:[G,R],grid,markers:{size:3,colors:[G],strokeColors:[R],strokeWidth:2},
+      legend:{labels:{colors:TL}}}).render();
+  }
+
+  new ApexCharts(document.getElementById('ch-pke'),{chart:{...bC,type:'bar',height:240},
+    series:[{name:'Aktual',data:kebunArr.map(v=>Math.round(v.ac))},{name:'Budget',data:kebunArr.map(v=>Math.round(v.b))}],
+    dataLabels:{enabled:false},plotOptions:{bar:{borderRadius:4,columnWidth:'55%'}},
+    xaxis:xA(kebunArr.map(v=>v.kebun)),yaxis:yA(v=>(v/1000).toFixed(0)+'K'),
+    colors:[G,'rgba(212,175,55,.45)'],tooltip:{theme:'dark'},grid,legend:{labels:{colors:TL}}}).render();
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -2736,40 +2891,18 @@ function renderPerawatan(){
     });
     const pbList = Object.entries(byJenisPb);
     html += `<div class="cc" style="margin-bottom:14px;"><div class="cc-t"><i class="fas fa-chart-column"></i> Rekom Total vs Realisasi 2024/2025/2026 per Jenis Pupuk</div><div id="ch-pupuk-blok"></div></div>
-    <div class="cc"><div class="cc-t"><span class="l"><i class="fas fa-table-list"></i> Tabel Pemupukan Blok — Detail per Blok</span></div>
-      <div class="tw" style="max-height:340px;"><table class="tbl"><thead><tr>
-        <th>AFD</th><th>Blok</th><th>Luas (Ha)</th><th>Populasi</th><th>Jenis Pupuk</th>
-        <th>Rekom Total (Kg)</th><th>Kg/Rotasi 1</th><th>Kg/Rotasi 2</th><th>Kg/Rotasi 3</th>
-        <th>Realisasi 2026</th><th>Ach 2026 (%)</th><th>Realisasi 2025</th><th>Realisasi 2024</th>
+    <div class="cc"><div class="cc-t"><span class="l"><i class="fas fa-table-list"></i> Tabel Pemupukan Blok per Jenis</span></div>
+      <div class="tw" style="max-height:300px;"><table class="tbl"><thead><tr>
+        <th>Jenis Pupuk</th><th>Rekom Total (Kg)</th><th>Realisasi 2026</th><th>Realisasi 2025</th><th>Realisasi 2024</th><th>Ach 2026 (%)</th>
       </tr></thead><tbody>
-      ${pb.slice(0,500).map(r=>{
-        const luas     = rowNum(r,'LUAS_(HA)','LUAS_HA','LUAS (HA)','LUAS','luas_(ha)','luas_ha','luas');
-        const populasi = rowNum(r,'POPULASI','populasi');
-        const jenis    = rowGet(r,'JENIS_PUPUK','jenis_pupuk','JENIS','jenis')||'-';
-        const rekom    = rowNum(r,'REKOM_TOTAL_KG','rekom_total_kg','REKOM_TOTAL','rekom_total');
-        const rot1     = rowNum(r,'KG/_ROTASI_1','KG_ROTASI_1','KG/ROTASI_1','kg/_rotasi_1','rotasi_1');
-        const rot2     = rowNum(r,'KG/_ROTASI_2','KG_ROTASI_2','KG/ROTASI_2','kg/_rotasi_2','rotasi_2');
-        const rot3     = rowNum(r,'KG/_ROTASI_3','KG_ROTASI_3','KG/ROTASI_3','kg/_rotasi_3','rotasi_3');
-        const real26   = rowNum(r,'REALISASI_KG_2026','realisasi_kg_2026');
-        const real25   = rowNum(r,'REALISASI_KG_2025','realisasi_kg_2025');
-        const real24   = rowNum(r,'REALISASI_KG_2024','realisasi_kg_2024');
-        const achRaw   = rowGet(r,'Ach 2026 (%)','ACH_2026_(%)','ach_2026_(%)','ACH_2026','ach_2026');
-        const ach      = achRaw!==''? (parseFloat(String(achRaw).replace('%','').replace(',','.'))||0) : (rekom>0?(real26/rekom*100):0);
-        return `<tr>
-          <td>${escHtml(rowGet(r,'AFD','afd'))}</td>
-          <td>${escHtml(rowGet(r,'BLOK','blok','KODE_BLOK'))}</td>
-          <td>${luas?luas.toLocaleString('id-ID'):'-'}</td>
-          <td>${populasi?Math.round(populasi).toLocaleString('id-ID'):'-'}</td>
-          <td><b>${escHtml(jenis)}</b></td>
-          <td>${Math.round(rekom).toLocaleString('id-ID')}</td>
-          <td>${Math.round(rot1).toLocaleString('id-ID')}</td>
-          <td>${Math.round(rot2).toLocaleString('id-ID')}</td>
-          <td>${Math.round(rot3).toLocaleString('id-ID')}</td>
-          <td>${Math.round(real26).toLocaleString('id-ID')}</td>
-          <td class="${ach>=95?'g':ach>=80?'wd':'bd'}">${ach.toFixed(1)}%</td>
-          <td>${Math.round(real25).toLocaleString('id-ID')}</td>
-          <td>${Math.round(real24).toLocaleString('id-ID')}</td>
-        </tr>`;
+      ${pbList.map(([j,v])=>{
+        const a26=v.rekom>0?(v.real2026/v.rekom*100):0;
+        return `<tr><td><b>${escHtml(j)}</b></td>
+          <td>${Math.round(v.rekom).toLocaleString('id-ID')}</td>
+          <td>${Math.round(v.real2026).toLocaleString('id-ID')}</td>
+          <td>${Math.round(v.real2025).toLocaleString('id-ID')}</td>
+          <td>${Math.round(v.real2024).toLocaleString('id-ID')}</td>
+          <td class="${a26>=95?'g':a26>=80?'wd':'bd'}">${a26.toFixed(1)}%</td></tr>`;
       }).join('')}
       </tbody></table></div></div>`;
   } else {
@@ -2847,39 +2980,22 @@ function renderPerawatan(){
 ════════════════════════════════════════════════════════════════════════ */
 
 function populatePbFilters(rows){
-  const kebunSel = document.getElementById('pb-kebun');
   const afdSel   = document.getElementById('pb-afd');
   const blokSel  = document.getElementById('pb-blok');
-  const curKebun = kebunSel.value;
   const curAfd   = afdSel.value;
   const curBlok  = blokSel.value;
 
-  // Kebun
-  const kebuns = [...new Set(rows.map(r=>r.KEBUN||r.ESTATE||r.kebun||r.estate).filter(Boolean))].sort();
-  kebunSel.innerHTML = '<option value="">Semua Kebun</option>' +
-    kebuns.map(k=>`<option value="${k}" ${k===curKebun?'selected':''}>${k}</option>`).join('');
-
-  // AFD (cascade dari kebun)
-  let afdSrc = rows;
-  if(curKebun) afdSrc = afdSrc.filter(r=>(r.KEBUN||r.ESTATE||r.kebun||r.estate)===curKebun);
-  const afds = [...new Set(afdSrc.map(r=>r.AFD||r.afd).filter(Boolean))].sort();
+  // AFD
+  const afds = [...new Set(rows.map(r=>r.AFD||r.afd).filter(Boolean))].sort();
   afdSel.innerHTML = '<option value="">Semua AFD</option>' +
     afds.map(a=>`<option value="${a}" ${a===curAfd?'selected':''}>${a}</option>`).join('');
 
-  // Blok (cascade dari kebun+afd)
+  // Blok (cascade dari afd)
   let blokSrc = rows;
-  if(curKebun) blokSrc = blokSrc.filter(r=>(r.KEBUN||r.ESTATE||r.kebun||r.estate)===curKebun);
   if(curAfd)   blokSrc = blokSrc.filter(r=>(r.AFD||r.afd)===curAfd);
   const bloks = [...new Set(blokSrc.map(r=>r.BLOK||r.blok||r.KODE_BLOK||r.kode_blok).filter(Boolean))].sort();
   blokSel.innerHTML = '<option value="">Semua Blok</option>' +
     bloks.map(b=>`<option value="${b}" ${b===curBlok?'selected':''}>${b}</option>`).join('');
-}
-
-function onPbKebunChange(){
-  document.getElementById('pb-afd').value  = '';
-  document.getElementById('pb-blok').value = '';
-  populatePbFilters(perblokRows);
-  renderPerblok();
 }
 
 function onPbAfdChange(){
@@ -2926,13 +3042,11 @@ function pbGet(r, ...keys){
 function renderPerblok(){
   const el    = document.getElementById('pb-content');
   const tahun = document.getElementById('pb-tahun').value;
-  const kebun = document.getElementById('pb-kebun').value;
   const afd   = document.getElementById('pb-afd').value;
   const blok  = document.getElementById('pb-blok').value;
 
   // Filter
   let rows = perblokRows;
-  if(kebun) rows = rows.filter(r=>(r.KEBUN||r.ESTATE||r.kebun||r.estate)===kebun);
   if(afd)   rows = rows.filter(r=>(r.AFD||r.afd)===afd);
   if(blok)  rows = rows.filter(r=>(r.BLOK||r.blok||r.KODE_BLOK)===blok);
 
@@ -2985,7 +3099,7 @@ function renderPerblok(){
 
   let html = `<div class="pbar"><div class="pbar-l"><i class="fas fa-map"></i><div>
     <div class="p-lbl">Data Per Blok — ${tahun}</div>
-    <div class="p-date">${kebun||'Semua Kebun'}${afd?' · AFD '+afd:''}${blok?' · Blok '+blok:''}</div>
+    <div class="p-date">${afd?'AFD '+afd:'Semua AFD'}${blok?' · Blok '+blok:''}</div>
   </div></div><span class="bdg bdg-g">${rows.length} baris · ${blokArr.length} blok</span></div>`;
 
   // ── KPI Cards ──
@@ -3183,6 +3297,7 @@ function renderPerblok(){
 ════════════════════════════════════════════════════════════════════════ */
 function render(id){
   if(id==='dashboard') loadDashboard();
+  else if(id==='perkebun') loadPerKebun();
   else if(id==='perblok') loadPerblok();
   else if(id==='import') loadImportHistory();
   else if(id==='mblok') loadBlok();
